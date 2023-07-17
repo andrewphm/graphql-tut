@@ -5,11 +5,19 @@ export class GraphQLClient {
 
   async query(query, variables) {
     try {
-      const url = new URL(this.uri);
-      url.searchParams.set('query', query);
-      url.searchParams.set('variables', JSON.stringify(variables));
-      const response = await fetch(url);
+      const response = await fetch(this.uri, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          query,
+          variables,
+        }),
+      });
+
       const { data } = await response.json();
+
       return {
         data,
         error: null,

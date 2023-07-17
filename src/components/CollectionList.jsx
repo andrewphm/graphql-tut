@@ -1,32 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '../shop-graphql/useQuery';
+import { GET_COLLECTIONS } from '../queries';
 
-const query = `
-{
-  collections(first: $first) {
-    edges {
-      cursor
-      node {
-        id
-        handle
-        title
-        description
-        image {
-          id
-          url
-        }
-      }
-    }
-  }
-}
-`;
 const variables = {
   first: 10,
 };
 
 function CollectionList() {
-  const { loading, error, data } = useQuery(query, variables);
+  const { loading, error, data } = useQuery(GET_COLLECTIONS, variables);
+
+  if (error) {
+    return <p>{error.message}</p>;
+  }
 
   if (loading) {
     return <p>loading..</p>;
@@ -34,13 +20,13 @@ function CollectionList() {
   const collections = data?.collections?.edges || [];
 
   return (
-    <section className="h-full w-full mx-auto flex justify-center flex-col items-center mt-11">
+    <section className="h-full w-full max-w-4xl mx-auto flex justify-center flex-col items-center mt-11">
       <h2 className="text-2xl font-bold">Collections</h2>
       <ul className="flex flex-wrap gap-5 h-full w-full items-center justify-center">
         {collections.map(({ node: collection }) => {
           const id = collection.id.split('/').pop();
           return (
-            <Link to={`/collections/${collection.handle}/${id}}`} key={collection.id}>
+            <Link to={`/collections/${collection.handle}/${id}`} key={collection.id}>
               <div className="py-4 flex flex-col items-center">
                 <div className="h-60 w-60 rounded-full">
                   <img className="h-full" src={collection.image.url} alt={collection.title} />
